@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+  <h2>User Dashboard</h2>
+
+  <h3>Latest Expenses</h3>
+  <p>Transport: {{ last_expense.transport }}</p>
+  <p>Education: {{ last_expense.education }}</p>
+  <p>Food: {{ last_expense.food }}</p>
+  <p>Utility: {{ last_expense.utility }}</p>
+  <p>Miscellaneous: {{ last_expense.misc }}</p>
+
+  <h3>Charts</h3>
+  <div>
+    <h4>Pie Chart</h4>
+    <img src="{{ url_for('static', filename='pie_chart.png') }}" alt="Pie Chart">
+  </div>
+
+  <div>
+    <h4>Bar Chart</h4>
+    <img src="{{ url_for('static', filename='bar_chart.png') }}" alt="Bar Chart">
+  </div>
+
+{% endblock %}

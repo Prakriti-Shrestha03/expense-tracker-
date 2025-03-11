@@ -1,0 +1,194 @@
+/* General Styles */
+body {
+  font-family: "Poppins", sans-serif;  /* Modern, clean font */
+  margin: 0;
+  padding: 0;
+  background-color: #C8F4A2;  /* Light Green */
+}
+
+/* Centered Container */
+.container {
+  width: 30%;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #F1FAE0; /* Soft greenish white */
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Main Content */
+.main-content {
+  padding: 20px;
+}
+
+/* Headings */
+h1, h2 {
+  color: #356A26;  /* Dark green */
+  text-align: center;
+}
+
+/* Navbar Styles */
+/* Navbar Styles */
+.navbar {
+  background-color: #A0E66E; /* Medium green */
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo */
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+  color: #264D2C; /* Dark green */
+  text-decoration: none;
+}
+
+/* Navbar Links */
+.nav-links {
+  display: flex;
+  gap: 15px; /* Spacing between links */
+}
+
+/* Navbar Link Style */
+.nav-links .nav-btn {
+  color: #495149; /* Light greenish text */
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  position: relative; /* Necessary for the pseudo-element positioning */
+  padding: 12px 20px;
+  display: inline-block;
+}
+
+/* Hover Effect */
+.nav-links .nav-btn::after {
+  content: ''; /* Empty content */
+  width: 0; /* Initially set width to 0 */
+  height: 3px; /* Height of the underline */
+  background: #59a768; /* Color of the underline */
+  position: absolute;
+  left: 0;
+  bottom: -5px; /* Position the underline below the text */
+  transition: width 0.5s ease-in-out; /* Smooth animation */
+}
+
+.nav-links .nav-btn:hover::after {
+  width: 100%; /* On hover, the underline will expand to full width */
+}
+
+.btn {
+  background-color: #7CB255; /* Medium green */
+  color: white;
+  padding: 12px 20px;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #A0E66E; /* Lighter green on hover */
+  color: #264D2C;
+}
+
+/* Form Input Styling */
+input[type="text"],
+input[type="number"],
+input[type="date"] {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus {
+  border-color: #356A26;
+  outline: none;
+}
+
+/* Error Message Styling */
+.error {
+  color: #e74c3c;
+  font-size: 1em;
+  margin-top: 10px;
+}
+
+/* General Dropdown Styling */
+select {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  background-color: #e0f2e9; /* Light green background */
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Dropdown Hover Effect */
+select:hover {
+  background-color: #c8e6c9; /* Slightly darker green background */
+  border-color: #388e3c; /* Darker green border */
+}
+
+/* Focus Effect */
+select:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(56, 142, 60, 0.7); /* Green shadow when focused */
+  border-color: #388e3c; /* Darker green border */
+}
+
+/* Option Styling */
+select option {
+  background-color: #ffffff; /* White background for options */
+
+}
+
+/* Option Hover Effect */
+select option:hover {
+  background-color: #a5d6a7; /* Lighter green background for options on hover */
+  color: #ffffff; /* White text when hovering over option */
+}
+
+label {
+  font-size: 18px;
+  color:  #616161;
+
+}
+
+#password{
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+#email{
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.main-content{
+  display: grid;
+  align-items: center;
+}
+
+p{
+  text-align: center;
+}

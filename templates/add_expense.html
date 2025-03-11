@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense{% endblock %}
+
+{% block content %}
+  <div class="title">
+    <h2>Add a New Expense</h2>
+  </div>
+  <div class="main-content">
+    <form method="POST">
+      <label for="category">Expense Category</label><br>
+      <select id="category" name="category" required>
+        <option value="Transport">Transport</option>
+        <option value="Education">Education</option>
+        <option value="Food">Food</option>
+        <option value="Utility">Utility</option>
+        <option value="Miscellaneous">Miscellaneous</option>
+      </select>
+      <br>
+      <label for="amount">Amount</label><br>
+      <input type="number" id="amount" name="amount" placeholder="Enter the amount" required><br>
+
+      <label for="date">Date</label><br>
+      <input type="date" id="date" name="date" required><br>
+
+      <button type="submit" class="btn">Add Expense</button>
+    </form>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
+{% endblock %}

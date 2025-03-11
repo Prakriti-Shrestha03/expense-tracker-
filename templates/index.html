@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <div class="main-content">
+    <h2>Welcome to Your Expense Manager</h2>
+    <p>Manage your expenses and budget effectively. Get started by either logging in or signing up.</p><br>
+
+    <div class="index-actions">
+      <a href="{{ url_for('login') }}" class="btn">Login</a>
+      <a href="{{ url_for('signup') }}" class="btn">Sign Up</a>
+    </div>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  {% set sidebar = False %}
+{% endblock %}

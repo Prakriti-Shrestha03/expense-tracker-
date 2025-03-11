@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Set Budget{% endblock %}
+
+{% block content %}
+  <div class="title">
+    <h2>Set Your Budget</h2>
+  </div>
+  <div class="main-content">
+    
+    <form method="POST">
+      <label for="budget_transport">Transport</label><br>
+      <input type="number" id="budget_transport" name="budget_transport" placeholder="Enter your transport budget" required><br>
+
+      <label for="budget_education">Education</label><br>
+      <input type="number" id="budget_education" name="budget_education" placeholder="Enter your education budget" required><br>
+
+      <label for="budget_food">Food</label><br>
+      <input type="number" id="budget_food" name="budget_food" placeholder="Enter your food budget" required><br>
+
+      <label for="budget_utility">Utility</label><br>
+      <input type="number" id="budget_utility" name="budget_utility" placeholder="Enter your utility budget" required><br>
+
+      <label for="budget_misc">Miscellaneous</label><br>
+      <input type="number" id="budget_misc" name="budget_misc" placeholder="Enter your miscellaneous budget" required><br>
+
+      <label for="saving_goal">Saving Goals</label><br>
+      <input type="number" id="saving_goal" name="saving_goal" placeholder="Enter your Saving Goal" required><br>
+
+      <button type="submit" class="btn">Set Budget</button>
+    </form>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
+{% endblock %}
