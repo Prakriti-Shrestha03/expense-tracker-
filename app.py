@@ -7,14 +7,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 import csv
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
-# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Database setup (using SQLite)
 Base = declarative_base()
 
 class Users(Base):
@@ -42,18 +43,16 @@ class User_Expenses(Base):
     datetime = Column(DateTime)
     saving_goal = Column(Float)
 
-# Create SQLite engine and session
 engine = create_engine('sqlite:///user.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session_db = Session()
 
-# Send email alert if user exceeds budget
 def send_alert(usernames):
     user = session_db.query(Users).filter(Users.username == usernames).first()
-    sender_email = "your_email@gmail.com"
+    sender_email = ""
     receiver_email = user.email
-    password = "your_password"  
+    password = ""  
 
     message = MIMEMultipart()
     message["From"] = sender_email
@@ -72,12 +71,10 @@ def send_alert(usernames):
     except Exception as e:
         print(f"Error: {e}")
 
-# Home route
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Signup route
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -85,20 +82,31 @@ def signup():
         username = request.form['username']
         password = request.form['password']
 
-        # Check if username already exists
         existing_user = session_db.query(Users).filter(Users.username == username).first()
         if existing_user:
             return "Username already taken. Try again."
 
-        # Add the user to the database
         user = Users(email=email, username=username, password=password)
         session_db.add(user)
         session_db.commit()
 
-        user_expenses = User_Expenses(username=username, budget=0, transport=0, education=0, food=0, 
-                                      utility=0, misc=0, total_saving=0, saving_goal=0, 
-                                      bud_transport=0, bud_education=0, bud_food=0, bud_utility=0, bud_misc=0,
-                                      datetime=datetime.datetime.now())
+        user_expenses = User_Expenses(
+            username=username, 
+            budget=0.0, 
+            transport=0.0, 
+            education=0.0, 
+            food=0.0, 
+            utility=0.0, 
+            misc=0.0, 
+            total_saving=0.0, 
+            saving_goal=0.0, 
+            bud_transport=0.0, 
+            bud_education=0.0, 
+            bud_food=0.0, 
+            bud_utility=0.0, 
+            bud_misc=0.0,
+            datetime=datetime.datetime.now()
+        )
         session_db.add(user_expenses)
         session_db.commit()
 
@@ -106,7 +114,6 @@ def signup():
 
     return render_template('signup.html')
 
-# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -126,65 +133,77 @@ def login():
 def user_dashboard():
     username = session.get('username')
     if not username:
-        return redirect(url_for('login'))  # Redirect if no username found in session
+        return redirect(url_for('login'))  
 
-    # Fetch the most recent expense record for the user
     last_expense = session_db.query(User_Expenses).filter(User_Expenses.username == username).order_by(User_Expenses.userid.desc()).first()
 
-    if not last_expense:
-        return redirect(url_for('add_expense'))  # Redirect to add expense if no records found
+    if last_expense:
+        for field in ['transport', 'education', 'food', 'utility', 'misc',
+                    'bud_transport', 'bud_education', 'bud_food', 'bud_utility', 'bud_misc',
+                    'total_saving', 'saving_goal']:
+            value = getattr(last_expense, field)
+            if not is_valid_number(value):
+                setattr(last_expense, field, 0.0)
+    if (last_expense.bud_transport==0.0 and last_expense.bud_education==0.0 and  last_expense.bud_food==0.0 and last_expense.bud_utility==0.0 and  last_expense.bud_misc==0.0):
+        return redirect(url_for('budgeting'))
 
-    # Check if the user has exceeded their budget and send alert if so
     if last_expense.transport > last_expense.bud_transport or last_expense.education > last_expense.bud_education or last_expense.food > last_expense.bud_food or last_expense.utility > last_expense.bud_utility or last_expense.misc > last_expense.bud_misc:
         send_alert(username)
-
-    # Generate pie chart and bar chart
-    pie_chart_filename = generate_pie_chart(last_expense)
-    bar_chart_filename = generate_bar_chart(last_expense)
+    
+    if not (last_expense.transport==0.0 and last_expense.education==0.0 and  last_expense.food==0.0 and
+              last_expense.utility==0.0 and  last_expense.misc==0.0):
+        pie_chart_filename = generate_pie_chart(last_expense)
+        bar_chart_filename = generate_bar_chart(last_expense)
+    else:
+        return redirect(url_for('add_expense'))
 
     return render_template('user_dashboard.html', 
                            last_expense=last_expense, 
                            pie_chart_filename=pie_chart_filename, 
                            bar_chart_filename=bar_chart_filename)
 
-# Function to generate pie chart and save as image
+def is_valid_number(value):
+    """Check if a value is a valid number (not NaN, None, or non-numeric)."""
+    if value is None:
+        return False
+    try:
+        return not math.isnan(float(value))
+    except (ValueError, TypeError):
+        return False
+
 def generate_pie_chart(last_expense):
     labels = ["Transport", "Education", "Food", "Utility", "Miscellaneous"]
     values = [last_expense.transport, last_expense.education, last_expense.food, 
               last_expense.utility, last_expense.misc]
 
-    # Create a pie chart
+    plt.switch_backend('Agg') 
     fig, ax = plt.subplots()
     ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie chart is drawn as a circle.
+    ax.axis('equal') 
 
-    # Save pie chart as PNG file in the static folder
     pie_chart_filename = 'static/pie_chart.png'
     plt.savefig(pie_chart_filename)
-    plt.close()  # Close the plot to free memory
+    plt.close() 
 
     return pie_chart_filename
 
-# Function to generate bar chart and save as image
 def generate_bar_chart(last_expense):
     labels = ["Transport", "Education", "Food", "Utility", "Miscellaneous"]
     values = [last_expense.transport, last_expense.education, last_expense.food, 
               last_expense.utility, last_expense.misc]
 
-    # Create a bar chart
+    plt.switch_backend('Agg') 
     fig, ax = plt.subplots()
     ax.bar(labels, values)
     ax.set_ylabel('Amount')
     ax.set_title('Expense Breakdown')
 
-    # Save bar chart as PNG file in the static folder
     bar_chart_filename = 'static/bar_chart.png'
     plt.savefig(bar_chart_filename)
-    plt.close()  # Close the plot to free memory
+    plt.close()  
 
     return bar_chart_filename
 
-# Add Expense route
 @app.route('/add_expense', methods=['GET', 'POST'])
 def add_expense():
     username = session.get('username')
@@ -195,20 +214,20 @@ def add_expense():
         category = request.form['category']
         amount = float(request.form['amount'])
 
-        categories = ["transport", "education", "food", "utility", "misc"]
+        categories = ["Transport", "Education", "Food", "Utility", "Miscellaneous"]
         if category not in categories:
             return "Invalid category. Try again."
 
         last_expense = session_db.query(User_Expenses).filter(User_Expenses.username == username).order_by(User_Expenses.userid.desc()).first()
-        if category == "transport":
+        if category == "Transport":
             last_expense.transport += amount
-        elif category == "education":
+        elif category == "Education":
             last_expense.education += amount
-        elif category == "food":
+        elif category == "Food":
             last_expense.food += amount
-        elif category == "utility":
+        elif category == "Utility":
             last_expense.utility += amount
-        elif category == "misc":
+        elif category == "Misc":
             last_expense.misc += amount
 
         last_expense.total_saving -= amount
@@ -220,7 +239,6 @@ def add_expense():
 
     return render_template('add_expense.html')
 
-# Delete Expense route
 @app.route('/delete_expense', methods=['GET', 'POST'])
 def delete_expense():
     username = session.get('username')
@@ -231,7 +249,7 @@ def delete_expense():
         category = request.form['category']
         amount = float(request.form['amount'])
 
-        categories = ["transport", "education", "food", "utility", "misc"]
+        categories = ["Transport", "Education", "Food", "Utility", "Miscellaneous"]
         if category not in categories:
             return "Invalid category. Try again."
 
@@ -256,7 +274,6 @@ def delete_expense():
 
     return render_template('delete_expense.html')
 
-# Budgeting route
 @app.route('/budgeting', methods=['GET', 'POST'])
 def budgeting():
     username = session.get('username')
@@ -290,7 +307,6 @@ def budgeting():
 
     return render_template('budgeting.html')
 
-# CSV download route
 @app.route('/download')
 def download():
     username = session.get('username')
@@ -306,8 +322,7 @@ def download():
         writer.writerow(["Username", "Transport", "Education", "Food", "Utility", "Misc", "Budget", "Total Savings", "Saving Goals"])
         writer.writerow([last_expense.username, last_expense.transport, last_expense.education, last_expense.food, last_expense.utility, last_expense.misc, last_expense.budget, last_expense.total_saving, last_expense.saving_goal])
 
-    return redirect(url_for('user_dashboard'))  # Redirect after download
+    return render_template('download.html')  
 
-# Run the Flask app
 if __name__ == '__main__':
     app.run(debug=True)
